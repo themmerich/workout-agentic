@@ -1,0 +1,27 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  [attr.viewBox]="wordmark() ? '0 0 150 40' : '0 0 40 40'"
+  class="h-full w-auto"
+  role="img"
+  aria-label="workout"
+>
+  <!-- The mark: a rounded tile with a dumbbell across it. -->
+  <rect width="40" height="40" rx="10" [attr.fill]="onPrimary() ? 'var(--p-primary-contrast-color)' : 'var(--p-primary-color)'" />
+  <g
+    fill="none"
+    [attr.stroke]="onPrimary() ? 'var(--p-primary-color)' : 'var(--p-primary-contrast-color)'"
+    stroke-width="2.6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M14 20h12" />
+    <path d="M11 13v14" />
+    <path d="M29 13v14" />
+    <path d="M7 16.5v7" />
+    <path d="M33 16.5v7" />
+  </g>
+  @if (wordmark()) {
+    <!-- The wordmark takes the page's text colour and font. -->
+    <text x="50" y="27.5" font-family="inherit" font-size="23" font-weight="600" letter-spacing="-0.4" fill="currentColor">workout</text>
+  }
+</svg>

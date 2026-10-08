@@ -1,0 +1,165 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Establish the cascade layer order once, before Tailwind is imported.
+   PrimeNG injects its styles into the `primeng` layer (see providePrimeNG in
+   app.config.ts), so it overrides Tailwind's preflight reset, while Tailwind's
+   `utilities` layer still wins over PrimeNG for utility classes. */
+@layer theme, base, primeng, components, utilities;
+
+@import 'tailwindcss';
+@import 'primeicons/primeicons.css';
+
+@plugin 'tailwindcss-primeui';
+
+/* Class-based dark mode: `dark:` variants react to the `.dark` class on <html>,
+   toggled by the ThemeService (core/data). PrimeNG uses the same selector via
+   `darkModeSelector` in app.config.ts. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* What the charts are drawn in. A canvas cannot resolve a CSS variable by
+   itself, so the page reads these values and hands them to the chart — which is
+   why they are plain colours here and not `light-dark()`. */
+:root {
+  --app-chart-text: #64748b;
+  --app-chart-grid: #e2e8f0;
+}
+
+.dark {
+  --app-chart-text: #94a3b8;
+  --app-chart-grid: #334155;
+}
+
+/* What the cost page's bars are drawn in, one colour per thing a call can be
+   for. Read into the canvas the same way as the chart colours above. */
+:root {
+  --app-ai-key-test: #64748b;
+}
+
+.dark {
+  --app-ai-key-test: #cbd5e1;
+}
+
+/* Which way a number moved against the stretch before it. Green for more, red for
+   less — with the triangle pointing the same way, so the colour is a second
+   reading of it and never the only one. */
+:root {
+  --app-trend-up: #15803d;
+  --app-trend-down: #b91c1c;
+}
+
+.dark {
+  --app-trend-up: #86efac;
+  --app-trend-down: #fca5a5;
+}
+
+[data-trend='up'] {
+  color: var(--app-trend-up);
+}
+[data-trend='down'] {
+  color: var(--app-trend-down);
+}
+
+/* Applied through a data attribute rather than a class: the element carries the
+   name it got from the API and nothing has to map it to a class list, so a
+   binding can never fight with the classes PrimeNG puts on the same element. */
+[data-category-color='blue'] {
+  color: var(--app-category-blue);
+}
+[data-category-color='green'] {
+  color: var(--app-category-green);
+}
+[data-category-color='amber'] {
+  color: var(--app-category-amber);
+}
+[data-category-color='red'] {
+  color: var(--app-category-red);
+}
+[data-category-color='violet'] {
+  color: var(--app-category-violet);
+}
+[data-category-color='teal'] {
+  color: var(--app-category-teal);
+}
+[data-category-color='grey'] {
+  color: var(--app-category-grey);
+}
+
+/* A picked row has to be plain to see. The theme's own highlight is a hint of mint that all but
+   disappears next to the colours the rows are drawn in, so the tint is turned up and the row gets
+   a bar on its left edge — which also survives when a whole stretch of rows is picked at once. */
+:root {
+  --p-datatable-row-selected-background: var(--p-primary-100);
+}
+
+.dark {
+  --p-datatable-row-selected-background: color-mix(in srgb, var(--p-primary-400) 24%, transparent);
+}
+
+.p-datatable-row-selected > td:first-child {
+  box-shadow: inset 0.25rem 0 0 var(--p-primary-color);
+}
+
+/* The tables' filter menus (cases/ui/case-list, admin/ui/user-list) hang in an overlay on
+   <body>, where component styles cannot reach them. PrimeNG stretches the two match-mode
+   selects across the menu but leaves what sits below them at its own width, so a text field
+   ends visibly short of the selects above it, and a multi-select ends short of everything.
+   Whatever is filtered with takes the width of the menu it stands in. */
+.p-datatable-filter-overlay :is(.p-inputtext, p-multiselect, p-select, p-datepicker) {
+  width: 100%;
+}
+
+/* The line between a mail and its reply (cases/feat-detail/case-detail-page). The two are boxes
+   of their own already, so the splitter draws no box around them and no bar between them — only
+   a short handle in the middle of the gutter says where to grab. */
+.app-case-detail-splitter {
+  --p-splitter-background: transparent;
+  --p-splitter-border-color: transparent;
+  --p-splitter-gutter-background: transparent;
+  --p-splitter-handle-background: var(--p-content-border-color);
+  --p-splitter-handle-size: 2.5rem;
+}
+
+/* While the line is being dragged, the panels must not catch the pointer: the splitter follows
+   it through the document, and a mail shown in a frame keeps every pointer event that lands on
+   it to itself — the drag would stall the moment the pointer crossed into the mail. Selecting
+   text on the way is not wanted either. */
+.app-case-detail-splitter[data-resizing] .p-splitter-panel {
+  pointer-events: none;
+  user-select: none;
+}
+
+/* The open message fills the panel it stands in (cases/ui/case-conversation). A <details> keeps
+   everything but its summary in a ::details-content box of the browser's own, and that box is no
+   flex item — so the frame showing the mail would stop at the height a frame has by default,
+   however much room the panel offers. `display: contents` takes the box out of the way and lets
+   the mail claim the space. Where the pseudo-element is unknown, the frame keeps the min-height
+   it carries and the page looks as it did before. */
+app-case-conversation details[open]::details-content {
+  display: contents;
+}
+
+/* Where it is unknown, the frame keeps the height it had before rather than falling back to the
+   150 pixels a frame is by default. */
+@supports not selector(::details-content) {
+  app-case-conversation details[open] iframe {
+    min-height: 24rem;
+  }
+}
+
+/* CDK drag & drop styling for the column-toggle popover (cases/ui/case-list).
+   The drag preview and the popover overlay are attached to <body>, so
+   component-scoped styles cannot reach them. */
+.app-column-toggle-drag-preview {
+  background: var(--p-content-background);
+  border-radius: var(--p-content-border-radius);
+  box-shadow: var(--p-overlay-popover-shadow);
+}
+
+.app-column-toggle-list .cdk-drag-placeholder {
+  opacity: 0.4;
+}
+
+/* The trail on the detail page: one-sided, so the words get the whole width of the aside. */
+.app-case-timeline .p-timeline-event-opposite {
+  display: none;
+}
