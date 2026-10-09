@@ -10,7 +10,7 @@ import { Sidebar } from './sidebar';
 const translations = {
   shell: {
     app: 'App',
-    home: 'Start',
+    habits: 'Habits',
     administration: 'Administration',
     users: 'Users',
     company: 'Company',
@@ -97,7 +97,7 @@ describe('Sidebar', () => {
 
     const text = (fixture.nativeElement as HTMLElement).textContent;
     expect(text).toContain('workout');
-    expect(text).toContain('Start');
+    expect(text).toContain('Habits');
   });
 
   it('signs out through the store and leaves for the login page', async () => {
@@ -112,12 +112,12 @@ describe('Sidebar', () => {
     expect(navigateSpy).toHaveBeenCalledWith(['/login']);
   });
 
-  it('links the start page', () => {
+  it('links the habits on the start page', () => {
     const fixture = TestBed.createComponent(Sidebar);
     fixture.detectChanges();
 
     const homeLink = (fixture.nativeElement as HTMLElement).querySelector('a[href="/"]');
-    expect(homeLink?.textContent).toContain('Start');
+    expect(homeLink?.textContent).toContain('Habits');
   });
 
   it('shows the signed-in user with their tenant', () => {
@@ -229,7 +229,7 @@ describe('Sidebar', () => {
     fixture.detectChanges();
     const element = fixture.nativeElement as HTMLElement;
 
-    expect(element.querySelector('a[href="/"]')?.textContent).toContain('Start');
+    expect(element.querySelector('a[href="/"]')?.textContent).toContain('Habits');
     expect(element.textContent).toContain('Administration');
     expect(element.textContent).toContain('Tenants');
 

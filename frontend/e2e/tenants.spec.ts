@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 
+// The start page is the habit grid; without this it would ask a backend that is not part of
+// this suite, and an unauthorised answer sends the app to the login.
+const EMPTY_WEEK = { start: '2026-10-05', today: '2026-10-09', categories: [], habits: [] };
+
 // Backend-less like the other e2e specs: the API is mocked per test, the
 // assertions use the German texts because de is the default language.
 const superuser = {
@@ -22,6 +26,7 @@ const beispiel = { ...musterfirma, id: 't2', slug: 'beispiel-ag', name: 'Beispie
 test.describe('Tenants', () => {
   test.beforeEach(async ({ page }) => {
     await page.route('**/api/auth/me', (route) => route.fulfill({ json: superuser }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
     await page.route('**/api/company', (route) => route.fulfill({ json: { name: 'workout', hasLogo: false } }));
   });
 
@@ -132,7 +137,7 @@ test.describe('Tenants', () => {
     await expect(page).toHaveURL(/\/$/);
     expect(opened).toEqual({ slug: 'musterfirma' });
     const navigation = page.getByRole('navigation');
-    await expect(navigation.getByRole('link', { name: 'Start' })).toBeVisible();
+    await expect(navigation.getByRole('link', { name: 'Gewohnheiten' })).toBeVisible();
     await expect(navigation.getByText('Administration')).toBeVisible();
     await expect(navigation.getByText('Mandant schließen')).toBeVisible();
   });

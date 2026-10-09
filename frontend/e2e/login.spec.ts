@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 
+// The start page is the habit grid; without this it would ask a backend that is not part of
+// this suite, and an unauthorised answer sends the app to the login.
+const EMPTY_WEEK = { start: '2026-10-05', today: '2026-10-09', categories: [], habits: [] };
+
 // Backend-less like the other e2e specs: the API is mocked per test, the
 // assertions use the German texts because de is the default language.
 const mockUser = {
@@ -17,6 +21,7 @@ test.describe('Login', () => {
 
   test('redirects anonymous visitors to the login page', async ({ page }) => {
     await page.route('**/api/auth/me', (route) => route.fulfill({ status: 401 }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
 
     await page.goto('/');
 
@@ -27,6 +32,7 @@ test.describe('Login', () => {
 
   test('signs in and lands on the start page', async ({ page }) => {
     await page.route('**/api/auth/me', (route) => route.fulfill({ status: 401 }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
     await page.route('**/api/company', (route) => route.fulfill({ json: { name: 'Musterfirma GmbH', hasLogo: false } }));
 
     let sent: Record<string, unknown> | undefined;
@@ -41,7 +47,7 @@ test.describe('Login', () => {
     await page.getByLabel('Passwort').fill('secret');
     await page.getByRole('button', { name: 'Anmelden' }).click();
 
-    await expect(page.getByRole('heading', { name: 'Willkommen' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Gewohnheiten', level: 1 })).toBeVisible();
     expect(sent).toEqual({ tenant: 'musterfirma', username: 'admin', password: 'secret' });
     // The sidebar footer shows who is signed in, and for which tenant; the
     // company name also brands the sidebar's top, hence first().
@@ -55,6 +61,7 @@ test.describe('Login', () => {
 
   test('shows an error for rejected credentials and stays on the login page', async ({ page }) => {
     await page.route('**/api/auth/me', (route) => route.fulfill({ status: 401 }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
     await page.route('**/api/auth/login', (route) => route.fulfill({ status: 401 }));
 
     await page.goto('/login');
@@ -68,6 +75,7 @@ test.describe('Login', () => {
 
   test('validates the form before calling the backend', async ({ page }) => {
     await page.route('**/api/auth/me', (route) => route.fulfill({ status: 401 }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
     let loginCalled = false;
     await page.route('**/api/auth/login', (route) => {
       loginCalled = true;
@@ -84,6 +92,7 @@ test.describe('Login', () => {
   test('sends a super-user without a tenant to the tenants page', async ({ page }) => {
     const superuser = { username: 'super', displayName: 'Sina Super', role: 'superuser', tenant: null };
     await page.route('**/api/auth/me', (route) => route.fulfill({ status: 401 }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
     await page.route('**/api/auth/login', (route) => route.fulfill({ json: superuser }));
     await page.route('**/api/company', (route) => route.fulfill({ json: { name: 'workout', hasLogo: false } }));
     // The tenants page asks for the list as soon as it opens; unanswered, the real backend's 401
@@ -101,7 +110,7 @@ test.describe('Login', () => {
     // Nothing of any tenant in the sidebar, only the tenants group.
     const navigation = page.getByRole('navigation');
     await expect(navigation.getByText('Mandanten')).toBeVisible();
-    await expect(navigation.getByRole('link', { name: 'Start' })).toHaveCount(0);
+    await expect(navigation.getByRole('link', { name: 'Gewohnheiten' })).toHaveCount(0);
     await expect(navigation.getByText('Administration')).toHaveCount(0);
   });
 });

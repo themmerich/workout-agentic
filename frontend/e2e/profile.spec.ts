@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 
+// The start page is the habit grid; without this it would ask a backend that is not part of
+// this suite, and an unauthorised answer sends the app to the login.
+const EMPTY_WEEK = { start: '2026-10-05', today: '2026-10-09', categories: [], habits: [] };
+
 // Backend-less like the other e2e specs: the API is mocked per test, the
 // assertions use the German texts because de is the default language.
 const user = {
@@ -30,6 +34,7 @@ const branches = [
 test.describe('Profile', () => {
   test('opens from the sidebar and shows the stored data', async ({ page }) => {
     await page.route('**/api/auth/me', (route) => route.fulfill({ json: user }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
     await page.route('**/api/company', (route) => route.fulfill({ json: { name: 'Musterfirma GmbH', hasLogo: false } }));
     await page.route('**/api/branches', (route) => route.fulfill({ json: branches }));
     await page.route('**/api/profile', (route) => route.fulfill({ json: profile }));
@@ -55,6 +60,7 @@ test.describe('Profile', () => {
 
   test('keeps a long page reachable inside the content area', async ({ page }) => {
     await page.route('**/api/auth/me', (route) => route.fulfill({ json: user }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
     await page.route('**/api/company', (route) => route.fulfill({ json: { name: 'Musterfirma GmbH', hasLogo: false } }));
     await page.route('**/api/branches', (route) => route.fulfill({ json: branches }));
     await page.route('**/api/profile', (route) => route.fulfill({ json: profile }));
@@ -74,6 +80,7 @@ test.describe('Profile', () => {
   test('saves the edited profile, which the sidebar picks up', async ({ page }) => {
     let currentName = 'Anna Admin';
     await page.route('**/api/auth/me', (route) => route.fulfill({ json: { ...user, displayName: currentName } }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
     await page.route('**/api/company', (route) => route.fulfill({ json: { name: 'Musterfirma GmbH', hasLogo: false } }));
     await page.route('**/api/branches', (route) => route.fulfill({ json: branches }));
     let saved: Record<string, unknown> | undefined;
@@ -104,6 +111,7 @@ test.describe('Profile', () => {
 
   test('validates the password change before calling the backend', async ({ page }) => {
     await page.route('**/api/auth/me', (route) => route.fulfill({ json: user }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
     await page.route('**/api/company', (route) => route.fulfill({ json: { name: 'Musterfirma GmbH', hasLogo: false } }));
     await page.route('**/api/branches', (route) => route.fulfill({ json: branches }));
     await page.route('**/api/profile', (route) => route.fulfill({ json: profile }));

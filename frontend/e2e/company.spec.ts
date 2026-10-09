@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 
+// The start page is the habit grid; without this it would ask a backend that is not part of
+// this suite, and an unauthorised answer sends the app to the login.
+const EMPTY_WEEK = { start: '2026-10-05', today: '2026-10-09', categories: [], habits: [] };
+
 // Backend-less like the other e2e specs: the API is mocked per test, the
 // assertions use the German texts because de is the default language.
 const adminUser = {
@@ -40,6 +44,7 @@ test.describe('Company', () => {
     // brand — the workout name in the preset's green — before swapping to the tenant's.
     let answer: (() => void) | null = null;
     await page.route('**/api/auth/me', (route) => route.fulfill({ json: adminUser }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
     await page.route('**/api/company', async (route) => {
       if (answer !== null) {
         await new Promise<void>((resolve) => (answer = resolve));
@@ -73,6 +78,7 @@ test.describe('Company', () => {
 
   test('lets an admin edit the company, and the sidebar picks the name up', async ({ page }) => {
     await page.route('**/api/auth/me', (route) => route.fulfill({ json: adminUser }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
     await page.route('**/api/branches', (route) => route.fulfill({ json: [headquarters, filiale] }));
     let saved: Record<string, unknown> | undefined;
     await page.route('**/api/company', (route) => {
@@ -120,6 +126,7 @@ test.describe('Company', () => {
 
   test('validates the form before calling the backend', async ({ page }) => {
     await page.route('**/api/auth/me', (route) => route.fulfill({ json: adminUser }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
     await page.route('**/api/branches', (route) => route.fulfill({ json: [headquarters, filiale] }));
     let saved = false;
     await page.route('**/api/company', (route) => {
@@ -141,6 +148,7 @@ test.describe('Company', () => {
 
   test('manages every site of the company, the headquarters among them', async ({ page }) => {
     await page.route('**/api/auth/me', (route) => route.fulfill({ json: adminUser }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
     await page.route('**/api/company', (route) => route.fulfill({ json: company }));
     let branches = [headquarters, filiale];
     let created: Record<string, unknown> | undefined;
@@ -188,6 +196,7 @@ test.describe('Company', () => {
 
   test('creates a site as the headquarters, which demotes the previous one', async ({ page }) => {
     await page.route('**/api/auth/me', (route) => route.fulfill({ json: adminUser }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
     await page.route('**/api/company', (route) => route.fulfill({ json: company }));
     let branches = [headquarters, filiale];
     let created: Record<string, unknown> | undefined;
@@ -224,12 +233,13 @@ test.describe('Company', () => {
 
   test('hides the company page from regular users and redirects them away', async ({ page }) => {
     await page.route('**/api/auth/me', (route) => route.fulfill({ json: regularUser }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
     await page.route('**/api/company', (route) => route.fulfill({ json: company }));
 
     await page.goto('/company');
 
     // The admin guard sends them to the start page; the sidebar offers no administration section.
-    await expect(page.getByRole('heading', { name: 'Willkommen' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Gewohnheiten', level: 1 })).toBeVisible();
     await expect(page.getByText('Administration')).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Firma' })).toHaveCount(0);
   });

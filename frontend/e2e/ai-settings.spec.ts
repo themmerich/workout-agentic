@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 
+// The start page is the habit grid; without this it would ask a backend that is not part of
+// this suite, and an unauthorised answer sends the app to the login.
+const EMPTY_WEEK = { start: '2026-10-05', today: '2026-10-09', categories: [], habits: [] };
+
 // Backend-less like the other e2e specs: the API is mocked per test, the
 // assertions use the German texts because de is the default language.
 const adminUser = {
@@ -14,6 +18,7 @@ const A_KEY = 'sk-ant-api03-testkey_0123456789';
 test.describe('AI access', () => {
   test.beforeEach(async ({ page }) => {
     await page.route('**/api/auth/me', (route) => route.fulfill({ json: adminUser }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
     await page.route('**/api/company', (route) => route.fulfill({ json: { name: 'Musterfirma GmbH', hasLogo: false } }));
   });
 
@@ -64,6 +69,7 @@ test.describe('AI access', () => {
 
   test('hides the page from regular users and redirects them away', async ({ page }) => {
     await page.route('**/api/auth/me', (route) => route.fulfill({ json: { ...adminUser, role: 'user' } }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
 
     await page.goto('/ai-settings');
 

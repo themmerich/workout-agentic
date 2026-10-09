@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 
+// The start page is the habit grid; without this it would ask a backend that is not part of
+// this suite, and an unauthorised answer sends the app to the login.
+const EMPTY_WEEK = { start: '2026-10-05', today: '2026-10-09', categories: [], habits: [] };
+
 // Backend-less like the other e2e specs: the API is mocked per test, the
 // assertions use the German texts because de is the default language.
 const adminUser = {
@@ -46,6 +50,7 @@ const anna = {
 test.describe('Users', () => {
   test('adds a user through the dialog, in the admin’s own company', async ({ page }) => {
     await page.route('**/api/auth/me', (route) => route.fulfill({ json: adminUser }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
     await page.route('**/api/company', (route) => route.fulfill({ json: company }));
     await page.route('**/api/branches', (route) => route.fulfill({ json: [headquarters, filiale] }));
     let users = [anna];
@@ -98,6 +103,7 @@ test.describe('Users', () => {
 
   test('edits a user through its row action, with no password in sight', async ({ page }) => {
     await page.route('**/api/auth/me', (route) => route.fulfill({ json: adminUser }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
     await page.route('**/api/company', (route) => route.fulfill({ json: company }));
     await page.route('**/api/branches', (route) => route.fulfill({ json: [headquarters, filiale] }));
     const ben = { ...anna, id: 'u2', username: 'ben', firstName: 'Ben', lastName: 'Benutzer', role: 'user', branchId: 'b2' };
@@ -132,6 +138,7 @@ test.describe('Users', () => {
 
   test('validates the form before calling the backend', async ({ page }) => {
     await page.route('**/api/auth/me', (route) => route.fulfill({ json: adminUser }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
     await page.route('**/api/company', (route) => route.fulfill({ json: company }));
     await page.route('**/api/branches', (route) => route.fulfill({ json: [headquarters] }));
     let created = false;
@@ -155,6 +162,7 @@ test.describe('Users', () => {
 
   test('lets the admin resize a column', async ({ page }) => {
     await page.route('**/api/auth/me', (route) => route.fulfill({ json: adminUser }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
     await page.route('**/api/company', (route) => route.fulfill({ json: company }));
     await page.route('**/api/branches', (route) => route.fulfill({ json: [headquarters] }));
     await page.route('**/api/users', (route) => route.fulfill({ json: [anna] }));
@@ -177,6 +185,7 @@ test.describe('Users', () => {
 
   test('generates an initial password on request', async ({ page }) => {
     await page.route('**/api/auth/me', (route) => route.fulfill({ json: adminUser }));
+    await page.route('**/api/habits/week**', (route) => route.fulfill({ json: EMPTY_WEEK }));
     await page.route('**/api/company', (route) => route.fulfill({ json: company }));
     await page.route('**/api/branches', (route) => route.fulfill({ json: [headquarters] }));
     await page.route('**/api/users', (route) => route.fulfill({ json: [anna] }));

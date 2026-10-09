@@ -26,10 +26,14 @@ Taken over from the frontdesk app as the starting point:
       the platform key as fallback; every call to the model is recorded with its tokens and
       priced from a table in the configuration, and an admin page shows the sums.
 
-## Next
+## Habits
 
-- [ ] **First feature** — the app's own domain next to `domains/home` in the frontend and a
-      package of its own in the backend.
+- [x] **Habit tracker** — the start page: every user keeps their own habits, daily or a number of
+      days per calendar week, optionally grouped into categories, and ticks them off in a week grid
+      with progress and streaks; past days can be back-filled, habits archived or deleted.
+      Design: [`docs/specs/2026-10-09-habit-tracker-design.md`](docs/specs/2026-10-09-habit-tracker-design.md).
+- [ ] **Dashboard** — a heatmap per habit over the last weeks and completion rates, built on the
+      backend's week report.
 
 ## Operations and security
 
