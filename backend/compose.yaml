@@ -11,5 +11,7 @@ services:
       - 'POSTGRES_DB=workout'
       - 'POSTGRES_PASSWORD=secret'
       - 'POSTGRES_USER=workout'
+    # Fixed host port so database tools can connect; 5435 rather than 5432 to
+    # stay clear of other local Postgres instances on 5432–5434.
     ports:
-      - '5432'
+      - '5435:5432'
