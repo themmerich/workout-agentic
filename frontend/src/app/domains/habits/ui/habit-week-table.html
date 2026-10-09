@@ -1,0 +1,163 @@
+<ng-container *transloco="let t">
+  <!-- Wider than a phone: the table scrolls sideways and the names stay put on the left. -->
+  <div class="overflow-x-auto rounded-lg border border-surface-200 dark:border-surface-700">
+    <table class="w-full border-collapse text-sm">
+      <caption class="sr-only">
+        {{
+          t('habits.tableCaption')
+        }}
+      </caption>
+      <thead>
+        <tr class="border-b border-surface-200 dark:border-surface-700">
+          <th scope="col" class="sticky left-0 z-10 bg-surface-0 px-3 py-2 text-left font-medium dark:bg-surface-900">
+            {{ t('habits.habit') }}
+          </th>
+          @for (day of days(); track day.iso) {
+            <th
+              scope="col"
+              class="w-12 px-1 py-2 text-center font-medium data-today:bg-surface-100 dark:data-today:bg-surface-800"
+              [attr.data-today]="day.isToday ? '' : null"
+              [attr.aria-current]="day.isToday ? 'date' : null"
+            >
+              <span class="block text-xs text-surface-500 dark:text-surface-400">{{ day.date | date: 'EEE' }}</span>
+              <span class="block">{{ day.date | date: 'd.' }}</span>
+            </th>
+          }
+          <th scope="col" class="px-3 py-2 text-center font-medium">{{ t('habits.week') }}</th>
+          <th scope="col" class="px-3 py-2 text-center font-medium">{{ t('habits.streak') }}</th>
+          <th scope="col" class="px-2 py-2">
+            <span class="sr-only">{{ t('habits.actions') }}</span>
+          </th>
+        </tr>
+      </thead>
+      @for (group of groups(); track group.category?.id ?? 'none') {
+        <tbody>
+          <tr class="bg-surface-50 dark:bg-surface-800">
+            <th scope="colgroup" [attr.colspan]="11" class="px-3 py-1.5 text-left">
+              <!-- Sticky like the names, so a sideways-scrolled table keeps its headings in view. -->
+              <div class="sticky left-3 flex w-fit items-center gap-2">
+                <span class="text-xs font-semibold tracking-wide text-surface-600 uppercase dark:text-surface-300">
+                  {{ group.category?.name ?? t('habits.withoutCategory') }}
+                </span>
+                @if (group.category; as category) {
+                  <p-button
+                    icon="pi pi-pencil"
+                    [text]="true"
+                    [rounded]="true"
+                    size="small"
+                    severity="secondary"
+                    [ariaLabel]="t('habits.renameCategoryNamed', { name: category.name })"
+                    [pTooltip]="t('habits.renameCategory')"
+                    (onClick)="renameCategory.emit(category)"
+                  />
+                  <p-button
+                    icon="pi pi-trash"
+                    [text]="true"
+                    [rounded]="true"
+                    size="small"
+                    severity="secondary"
+                    [ariaLabel]="t('habits.deleteCategoryNamed', { name: category.name })"
+                    [pTooltip]="t('habits.deleteCategory')"
+                    (onClick)="deleteCategory.emit(category)"
+                  />
+                }
+              </div>
+            </th>
+          </tr>
+          @for (habit of group.habits; track habit.id) {
+            <tr class="border-b border-surface-100 last:border-b-0 dark:border-surface-800">
+              <th scope="row" class="sticky left-0 z-10 bg-surface-0 px-3 py-2 text-left font-normal dark:bg-surface-900">
+                <span class="block font-medium whitespace-nowrap">{{ habit.name }}</span>
+                <span class="block text-xs text-surface-500 dark:text-surface-400">
+                  @if (habit.frequency === 'DAILY') {
+                    {{ t('habits.daily') }}
+                  } @else {
+                    {{ t('habits.timesPerWeek', { count: habit.weeklyTarget }) }}
+                  }
+                </span>
+              </th>
+              @for (day of days(); track day.iso) {
+                <td
+                  class="px-1 py-2 text-center data-today:bg-surface-100 dark:data-today:bg-surface-800"
+                  [attr.data-today]="day.isToday ? '' : null"
+                >
+                  <button
+                    type="button"
+                    class="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md border-2 border-primary transition-colors hover:bg-emphasis focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-default disabled:border-dashed disabled:border-surface-300 disabled:hover:bg-transparent aria-pressed:bg-primary aria-pressed:text-primary-contrast aria-pressed:hover:bg-primary-emphasis dark:disabled:border-surface-600"
+                    [disabled]="day.isFuture"
+                    [attr.aria-pressed]="isChecked(habit, day.iso)"
+                    [attr.aria-label]="habit.name + ', ' + (day.date | date: 'fullDate')"
+                    (click)="onCell(habit, day)"
+                  >
+                    @if (isChecked(habit, day.iso)) {
+                      <i class="pi pi-check text-sm!" aria-hidden="true"></i>
+                    }
+                  </button>
+                </td>
+              }
+              <td class="px-3 py-2 text-center whitespace-nowrap">
+                <span [class.font-semibold]="isWeekReached(habit)" [class.text-primary]="isWeekReached(habit)">
+                  {{ habit.weekDone }}/{{ habit.weekTarget }}
+                </span>
+              </td>
+              <td class="px-3 py-2 text-center whitespace-nowrap">
+                @if (habit.streak > 0) {
+                  <i class="pi pi-bolt mr-1 text-xs! text-primary" aria-hidden="true"></i>
+                }
+                @if (habit.frequency === 'DAILY') {
+                  {{ t(habit.streak === 1 ? 'habits.streakDay' : 'habits.streakDays', { count: habit.streak }) }}
+                } @else {
+                  {{ t(habit.streak === 1 ? 'habits.streakWeek' : 'habits.streakWeeks', { count: habit.streak }) }}
+                }
+              </td>
+              <td class="px-2 py-2">
+                <div class="flex justify-end gap-0.5 whitespace-nowrap">
+                  <p-button
+                    icon="pi pi-pencil"
+                    [text]="true"
+                    [rounded]="true"
+                    size="small"
+                    severity="secondary"
+                    [ariaLabel]="t('habits.editHabitNamed', { name: habit.name })"
+                    [pTooltip]="t('habits.editHabit')"
+                    (onClick)="editHabit.emit(habit)"
+                  />
+                  <p-button
+                    icon="pi pi-inbox"
+                    [text]="true"
+                    [rounded]="true"
+                    size="small"
+                    severity="secondary"
+                    [ariaLabel]="t('habits.archiveHabitNamed', { name: habit.name })"
+                    [pTooltip]="t('habits.archiveHabit')"
+                    (onClick)="archiveHabit.emit(habit)"
+                  />
+                  <p-button
+                    icon="pi pi-trash"
+                    [text]="true"
+                    [rounded]="true"
+                    size="small"
+                    severity="secondary"
+                    [ariaLabel]="t('habits.deleteHabitNamed', { name: habit.name })"
+                    [pTooltip]="t('habits.deleteHabit')"
+                    (onClick)="deleteHabit.emit(habit)"
+                  />
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <!-- A category created first: offer to fill it right where it stands. -->
+            <tr>
+              <td [attr.colspan]="11" class="px-3 py-2 text-sm text-surface-500 dark:text-surface-400">
+                <span class="sticky left-3 inline-flex items-center">
+                  {{ t('habits.emptyCategory') }}
+                  <p-button [label]="t('habits.addToCategory')" [link]="true" size="small" (onClick)="addHabit.emit(group.category)" />
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      }
+    </table>
+  </div>
+</ng-container>

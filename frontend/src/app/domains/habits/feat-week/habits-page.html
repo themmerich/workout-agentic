@@ -1,0 +1,218 @@
+<ng-container *transloco="let t">
+  <main class="flex flex-col gap-4">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <h1 class="text-2xl font-semibold">{{ t('habits.title') }}</h1>
+      <div class="flex flex-wrap gap-2">
+        <p-button icon="pi pi-plus" [label]="t('habits.newHabit')" (onClick)="onAddHabit()" />
+        <p-button
+          icon="pi pi-folder-plus"
+          [label]="t('habits.newCategory')"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="onAddCategory()"
+        />
+        <p-button icon="pi pi-inbox" [label]="t('habits.archive')" severity="secondary" [text]="true" (onClick)="onOpenArchive()" />
+      </div>
+    </div>
+
+    <!-- value() throws while the resource is in the error state, so the grid only renders once there is a week. -->
+    @if (habitsService.week.error()) {
+      <p class="text-red-600 dark:text-red-400">{{ t('habits.loadError') }}</p>
+    } @else if (loadedWeek(); as week) {
+      <div class="flex flex-wrap items-center gap-2">
+        <p-button
+          icon="pi pi-chevron-left"
+          [text]="true"
+          [rounded]="true"
+          severity="secondary"
+          [ariaLabel]="t('habits.previousWeek')"
+          (onClick)="onPreviousWeek()"
+        />
+        @if (heading(); as heading) {
+          <h2 class="min-w-48 text-center text-lg font-medium">
+            {{ t('habits.calendarWeek', { number: heading.number }) }}
+            <span class="font-normal text-surface-500 dark:text-surface-400">
+              · {{ heading.from | date: 'd. MMM' }} – {{ heading.to | date: 'd. MMM yyyy' }}
+            </span>
+          </h2>
+        }
+        <p-button
+          icon="pi pi-chevron-right"
+          [text]="true"
+          [rounded]="true"
+          severity="secondary"
+          [ariaLabel]="t('habits.nextWeek')"
+          (onClick)="onNextWeek()"
+        />
+        <p-button
+          [label]="t('habits.thisWeek')"
+          size="small"
+          severity="secondary"
+          [outlined]="true"
+          [disabled]="isCurrentWeek()"
+          (onClick)="onThisWeek()"
+        />
+      </div>
+
+      @if (isEmpty()) {
+        <div
+          class="flex flex-col items-center gap-3 rounded-lg border border-dashed border-surface-300 p-10 text-center dark:border-surface-600"
+        >
+          <i class="pi pi-check-square text-3xl! text-primary" aria-hidden="true"></i>
+          <p class="max-w-md text-surface-600 dark:text-surface-300">{{ t('habits.emptyHint') }}</p>
+          <p-button icon="pi pi-plus" [label]="t('habits.firstHabit')" (onClick)="onAddHabit()" />
+        </div>
+      } @else {
+        <app-habit-week-table
+          [week]="week"
+          [pending]="pending()"
+          (dayToggle)="onToggle($event)"
+          (addHabit)="onAddHabit($event)"
+          (editHabit)="onEditHabit($event)"
+          (archiveHabit)="onArchiveHabit($event)"
+          (deleteHabit)="onDeleteHabit($event)"
+          (renameCategory)="onRenameCategory($event)"
+          (deleteCategory)="onDeleteCategory($event)"
+        />
+      }
+    } @else {
+      <p class="text-surface-500 dark:text-surface-400" role="status">{{ t('habits.loading') }}</p>
+    }
+
+    <p-dialog
+      [header]="t(editingHabitId() === null ? 'habits.newHabit' : 'habits.editHabit')"
+      [modal]="true"
+      [(visible)]="isHabitDialogVisible"
+      [style]="{ width: '26rem' }"
+    >
+      <form novalidate class="flex flex-col gap-4 pt-2" (submit)="onSaveHabit($event)">
+        <div class="flex flex-col gap-2">
+          <p-floatlabel variant="on">
+            <input pInputText id="habitName" type="text" class="w-full" autocomplete="off" [formField]="habitForm.name" />
+            <label for="habitName">{{ t('habits.name') }}</label>
+          </p-floatlabel>
+          @if (habitForm.name().invalid()) {
+            <p-message severity="error" variant="simple" size="small">{{ t('habits.nameRequired') }}</p-message>
+          }
+        </div>
+        <p-floatlabel variant="on">
+          <p-select
+            inputId="habitCategory"
+            class="w-full"
+            appendTo="body"
+            [options]="categoryOptions()"
+            optionLabel="label"
+            optionValue="value"
+            [formField]="habitForm.categoryId"
+          />
+          <label for="habitCategory">{{ t('habits.category') }}</label>
+        </p-floatlabel>
+        <div class="flex flex-col gap-2">
+          <span id="habitFrequencyLabel" class="text-sm font-medium">{{ t('habits.frequency') }}</span>
+          <p-selectbutton
+            [options]="frequencyOptions()"
+            optionLabel="label"
+            optionValue="value"
+            [allowEmpty]="false"
+            ariaLabelledBy="habitFrequencyLabel"
+            [formField]="habitForm.frequency"
+          />
+        </div>
+        @if (habitModel().frequency === 'WEEKLY') {
+          <div class="flex items-center gap-3">
+            <p-inputnumber
+              inputId="habitTarget"
+              [min]="1"
+              [max]="7"
+              [showButtons]="true"
+              buttonLayout="horizontal"
+              inputStyleClass="w-12 text-center"
+              [formField]="habitForm.weeklyTarget"
+            />
+            <label for="habitTarget">{{ t('habits.daysPerWeek') }}</label>
+          </div>
+        }
+        <div class="flex justify-end gap-2">
+          <p-button
+            type="button"
+            [label]="t('habits.cancel')"
+            severity="secondary"
+            [outlined]="true"
+            (onClick)="isHabitDialogVisible.set(false)"
+          />
+          <p-button type="submit" icon="pi pi-check" [label]="t('habits.save')" [loading]="isSavingHabit()" />
+        </div>
+      </form>
+    </p-dialog>
+
+    <p-dialog
+      [header]="t(editingCategoryId() === null ? 'habits.newCategory' : 'habits.renameCategory')"
+      [modal]="true"
+      [(visible)]="isCategoryDialogVisible"
+      [style]="{ width: '24rem' }"
+    >
+      <form novalidate class="flex flex-col gap-4 pt-2" (submit)="onSaveCategory($event)">
+        <div class="flex flex-col gap-2">
+          <p-floatlabel variant="on">
+            <input pInputText id="categoryName" type="text" class="w-full" autocomplete="off" [formField]="categoryForm.name" />
+            <label for="categoryName">{{ t('habits.name') }}</label>
+          </p-floatlabel>
+          @if (categoryForm.name().invalid()) {
+            <p-message severity="error" variant="simple" size="small">{{ t('habits.nameRequired') }}</p-message>
+          } @else if (isCategoryNameTaken()) {
+            <p-message severity="error" variant="simple" size="small">{{ t('habits.categoryNameTaken') }}</p-message>
+          }
+        </div>
+        <div class="flex justify-end gap-2">
+          <p-button
+            type="button"
+            [label]="t('habits.cancel')"
+            severity="secondary"
+            [outlined]="true"
+            (onClick)="isCategoryDialogVisible.set(false)"
+          />
+          <p-button type="submit" icon="pi pi-check" [label]="t('habits.save')" [loading]="isSavingCategory()" />
+        </div>
+      </form>
+    </p-dialog>
+
+    <p-dialog [header]="t('habits.archiveTitle')" [modal]="true" [(visible)]="isArchiveDialogVisible" [style]="{ width: '30rem' }">
+      @if (habitsService.archived.error()) {
+        <p class="text-red-600 dark:text-red-400">{{ t('habits.loadError') }}</p>
+      } @else {
+        <ul class="flex flex-col divide-y divide-surface-200 dark:divide-surface-700">
+          @for (habit of habitsService.archived.value(); track habit.id) {
+            <li class="flex items-center gap-2 py-2">
+              <span class="flex-1">
+                <span class="block font-medium">{{ habit.name }}</span>
+                @if (habit.categoryName) {
+                  <span class="block text-xs text-surface-500 dark:text-surface-400">{{ habit.categoryName }}</span>
+                }
+              </span>
+              <p-button
+                icon="pi pi-replay"
+                [label]="t('habits.restore')"
+                size="small"
+                severity="secondary"
+                [outlined]="true"
+                [ariaLabel]="t('habits.restoreNamed', { name: habit.name })"
+                (onClick)="onRestoreHabit(habit)"
+              />
+              <p-button
+                icon="pi pi-trash"
+                [text]="true"
+                [rounded]="true"
+                size="small"
+                severity="danger"
+                [ariaLabel]="t('habits.deleteHabitNamed', { name: habit.name })"
+                (onClick)="onDeleteHabit(habit)"
+              />
+            </li>
+          } @empty {
+            <li class="py-4 text-center text-surface-500 dark:text-surface-400">{{ t('habits.archiveEmpty') }}</li>
+          }
+        </ul>
+      }
+    </p-dialog>
+  </main>
+</ng-container>

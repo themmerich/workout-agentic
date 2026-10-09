@@ -19,10 +19,10 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       {
-        // The start page is about a tenant: a super-user with none open is sent to the tenants page.
+        // The habits are a tenant user's: a super-user with none open is sent to the tenants page.
         path: '',
         canActivate: [tenantGuard],
-        loadChildren: () => import('./domains/home/api/home-routes').then((m) => m.homeRoutes),
+        loadChildren: () => import('./domains/habits/api/habits-routes').then((m) => m.habitsRoutes),
       },
       {
         path: 'tenants',
