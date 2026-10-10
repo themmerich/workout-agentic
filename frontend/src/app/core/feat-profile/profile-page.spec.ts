@@ -36,7 +36,6 @@ const translations = {
     emailInvalid: 'Please enter a valid email address.',
     phone: 'Phone',
     fax: 'Fax',
-    save: 'Save',
     saved: 'Profile saved.',
     account: 'Sign-in',
     username: 'Username',
@@ -52,6 +51,9 @@ const translations = {
     passwordWrong: 'The current password is wrong.',
     error: 'Saving failed.',
     loadError: 'Could not load the profile.',
+  },
+  common: {
+    save: 'Save',
   },
 };
 

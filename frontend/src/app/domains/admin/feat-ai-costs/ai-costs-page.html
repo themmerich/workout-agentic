@@ -8,7 +8,7 @@
         icon="pi pi-refresh"
         severity="secondary"
         [outlined]="true"
-        [label]="t('aiCosts.refresh')"
+        [label]="t('common.refresh')"
         [loading]="aiUsageService.usage.isLoading()"
         (onClick)="onRefresh()"
       />
@@ -17,7 +17,7 @@
     @if (aiUsageService.usage.error()) {
       <p-message severity="error">{{ t('aiCosts.loadError') }}</p-message>
     } @else if (!hasLoaded()) {
-      <div class="flex flex-auto items-center justify-center py-16" role="status" [attr.aria-label]="t('aiCosts.loading')">
+      <div class="flex flex-auto items-center justify-center py-16" role="status" [attr.aria-label]="t('common.loading')">
         <i class="pi pi-spinner pi-spin text-3xl text-surface-400 dark:text-surface-500" aria-hidden="true"></i>
       </div>
     } @else {

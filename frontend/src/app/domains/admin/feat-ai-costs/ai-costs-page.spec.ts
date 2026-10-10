@@ -24,7 +24,6 @@ vi.mock('chart.js/auto', () => ({
 const translations = {
   aiCosts: {
     title: 'AI costs',
-    refresh: 'Refresh',
     intro: 'Estimated from the tokens.',
     unpriced: '{{count}} calls have no priced model.',
     today: 'Today',
@@ -38,6 +37,9 @@ const translations = {
     unit: { day: 'Day', month: 'Month', year: 'Year' },
     prices: { title: 'Prices', model: 'Model', input: 'In', output: 'Out' },
     loadError: 'The AI costs could not be loaded.',
+  },
+  common: {
+    refresh: 'Refresh',
     loading: 'Loading',
   },
 };

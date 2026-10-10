@@ -11,7 +11,6 @@ const translations = {
     habit: 'Habit',
     week: 'Week',
     streak: 'Streak',
-    actions: 'Actions',
     withoutCategory: 'Without category',
     daily: 'daily',
     timesPerWeek: '{{count}}× per week',
@@ -31,6 +30,9 @@ const translations = {
     deleteCategoryNamed: 'Delete {{name}}',
     emptyCategory: 'No habits yet.',
     addToCategory: 'Add a habit',
+  },
+  common: {
+    actions: 'Actions',
   },
 };
 

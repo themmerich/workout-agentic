@@ -13,11 +13,11 @@
       <p-table [value]="tenantsService.tenants.value()" dataKey="id" [loading]="tenantsService.tenants.isLoading()">
         <ng-template #header>
           <tr>
-            <th scope="col">{{ t('tenants.name') }}</th>
+            <th scope="col">{{ t('common.name') }}</th>
             <th scope="col">{{ t('tenants.slug') }}</th>
             <th scope="col" class="text-right">{{ t('tenants.users') }}</th>
             <th scope="col">{{ t('tenants.createdAt') }}</th>
-            <th scope="col">{{ t('tenants.actions') }}</th>
+            <th scope="col">{{ t('common.actions') }}</th>
           </tr>
         </ng-template>
         <ng-template #body let-row>
@@ -40,8 +40,8 @@
                   icon="pi pi-sign-in"
                   severity="secondary"
                   [text]="true"
-                  [ariaLabel]="t('tenants.open')"
-                  [pTooltip]="t('tenants.open')"
+                  [ariaLabel]="t('common.open')"
+                  [pTooltip]="t('common.open')"
                   tooltipPosition="bottom"
                   [loading]="openingSlug() === row.slug"
                   (onClick)="onOpen(row)"
@@ -50,8 +50,8 @@
                   icon="pi pi-pencil"
                   severity="secondary"
                   [text]="true"
-                  [ariaLabel]="t('tenants.edit')"
-                  [pTooltip]="t('tenants.edit')"
+                  [ariaLabel]="t('common.edit')"
+                  [pTooltip]="t('common.edit')"
                   tooltipPosition="bottom"
                   (onClick)="onEdit(row)"
                 />
@@ -59,8 +59,8 @@
                   icon="pi pi-trash"
                   severity="danger"
                   [text]="true"
-                  [ariaLabel]="t('tenants.delete')"
-                  [pTooltip]="t('tenants.delete')"
+                  [ariaLabel]="t('common.delete')"
+                  [pTooltip]="t('common.delete')"
                   tooltipPosition="bottom"
                   (onClick)="onDelete(row)"
                 />
@@ -87,7 +87,7 @@
               <p-inputgroup-addon><i class="pi pi-building" aria-hidden="true"></i></p-inputgroup-addon>
               <p-floatlabel variant="on">
                 <input pInputText id="tenant-name" type="text" autocomplete="organization" [formField]="tenantForm.name" />
-                <label for="tenant-name">{{ t('tenants.name') }}</label>
+                <label for="tenant-name">{{ t('common.name') }}</label>
               </p-floatlabel>
             </p-inputgroup>
             @if (tenantForm.name().invalid()) {
@@ -116,13 +116,13 @@
               type="button"
               severity="secondary"
               [outlined]="true"
-              [label]="t('tenants.cancel')"
+              [label]="t('common.cancel')"
               (onClick)="isDialogVisible.set(false)"
             />
             <p-button
               type="submit"
               icon="pi pi-check"
-              [label]="t('tenants.save')"
+              [label]="t('common.save')"
               [loading]="isSaving()"
               [disabled]="tenantForm().invalid() || !tenantForm().dirty()"
             />
@@ -157,7 +157,7 @@
                 type="button"
                 severity="secondary"
                 [outlined]="true"
-                [label]="t('tenants.cancel')"
+                [label]="t('common.cancel')"
                 (onClick)="deletingTenant.set(null)"
               />
               <p-button

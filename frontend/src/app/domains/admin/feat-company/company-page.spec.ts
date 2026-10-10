@@ -32,7 +32,6 @@ const translations = {
     email: 'Email address',
     emailInvalid: 'Please enter a valid email address.',
     website: 'Website',
-    save: 'Save',
     saved: 'Company data saved.',
     branches: 'Branches',
     branchName: 'Name',
@@ -42,14 +41,17 @@ const translations = {
     branchAdd: 'New branch',
     branchEdit: 'Edit branch',
     branchDelete: 'Delete branch',
-    branchActions: 'Actions',
     branchSaved: 'Branch saved.',
     branchDeleted: 'Branch deleted.',
     branchDuplicate: 'A branch with this name already exists.',
     branchesEmpty: 'No branches yet.',
-    cancel: 'Cancel',
     error: 'Saving failed.',
     loadError: 'Could not load the company data.',
+  },
+  common: {
+    save: 'Save',
+    cancel: 'Cancel',
+    actions: 'Actions',
   },
 };
 

@@ -76,7 +76,7 @@
         />
       }
     } @else {
-      <p class="text-surface-500 dark:text-surface-400" role="status">{{ t('habits.loading') }}</p>
+      <p class="text-surface-500 dark:text-surface-400" role="status">{{ t('common.loading') }}</p>
     }
 
     <p-dialog
@@ -89,7 +89,7 @@
         <div class="flex flex-col gap-2">
           <p-floatlabel variant="on">
             <input pInputText id="habitName" type="text" class="w-full" autocomplete="off" [formField]="habitForm.name" />
-            <label for="habitName">{{ t('habits.name') }}</label>
+            <label for="habitName">{{ t('common.name') }}</label>
           </p-floatlabel>
           @if (habitForm.name().invalid()) {
             <p-message severity="error" variant="simple" size="small">{{ t('habits.nameRequired') }}</p-message>
@@ -135,12 +135,12 @@
         <div class="flex justify-end gap-2">
           <p-button
             type="button"
-            [label]="t('habits.cancel')"
+            [label]="t('common.cancel')"
             severity="secondary"
             [outlined]="true"
             (onClick)="isHabitDialogVisible.set(false)"
           />
-          <p-button type="submit" icon="pi pi-check" [label]="t('habits.save')" [loading]="isSavingHabit()" />
+          <p-button type="submit" icon="pi pi-check" [label]="t('common.save')" [loading]="isSavingHabit()" />
         </div>
       </form>
     </p-dialog>
@@ -155,7 +155,7 @@
         <div class="flex flex-col gap-2">
           <p-floatlabel variant="on">
             <input pInputText id="categoryName" type="text" class="w-full" autocomplete="off" [formField]="categoryForm.name" />
-            <label for="categoryName">{{ t('habits.name') }}</label>
+            <label for="categoryName">{{ t('common.name') }}</label>
           </p-floatlabel>
           @if (categoryForm.name().invalid()) {
             <p-message severity="error" variant="simple" size="small">{{ t('habits.nameRequired') }}</p-message>
@@ -166,12 +166,12 @@
         <div class="flex justify-end gap-2">
           <p-button
             type="button"
-            [label]="t('habits.cancel')"
+            [label]="t('common.cancel')"
             severity="secondary"
             [outlined]="true"
             (onClick)="isCategoryDialogVisible.set(false)"
           />
-          <p-button type="submit" icon="pi pi-check" [label]="t('habits.save')" [loading]="isSavingCategory()" />
+          <p-button type="submit" icon="pi pi-check" [label]="t('common.save')" [loading]="isSavingCategory()" />
         </div>
       </form>
     </p-dialog>
