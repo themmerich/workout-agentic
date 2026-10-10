@@ -109,7 +109,7 @@
                 <p-button
                   type="submit"
                   icon="pi pi-check"
-                  [label]="t('company.save')"
+                  [label]="t('common.save')"
                   [loading]="isSaving()"
                   [disabled]="companyForm().invalid() || !companyForm().dirty()"
                 />
@@ -129,7 +129,7 @@
                         <th scope="col">{{ t('company.city') }}</th>
                         <th scope="col">{{ t('company.phone') }}</th>
                         <th scope="col" class="w-24">
-                          <span class="sr-only">{{ t('company.branchActions') }}</span>
+                          <span class="sr-only">{{ t('common.actions') }}</span>
                         </th>
                       </tr>
                     </ng-template>
@@ -266,10 +266,10 @@
               type="button"
               severity="secondary"
               [outlined]="true"
-              [label]="t('company.cancel')"
+              [label]="t('common.cancel')"
               (onClick)="isBranchDialogVisible.set(false)"
             />
-            <p-button type="submit" icon="pi pi-check" [label]="t('company.save')" [loading]="isSavingBranch()" />
+            <p-button type="submit" icon="pi pi-check" [label]="t('common.save')" [loading]="isSavingBranch()" />
           </div>
         </form>
       </p-dialog>

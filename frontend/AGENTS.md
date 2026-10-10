@@ -26,7 +26,10 @@ Angular 22 (standalone components + signals, zoneless), pnpm, PrimeNG, Transloco
 - **Match dependency majors to Angular 22.** Where no v22 release exists yet
   (e.g. PrimeNG 22 RC, NgRx 21), that is intentional — expect and note peer warnings.
 - **Static assets live in `public/`** (served at the app root), not `src/assets`.
-  Transloco translations are in `public/i18n/<lang>.json`.
+  Transloco translations: generic vocabulary (button labels and the like, namespace
+  `common`) lives in `public/i18n/<lang>.json`; everything else is split into
+  `public/i18n/<part>/<lang>.json` — `core` and one per domain. The loader
+  (`src/app/core/transloco-loader.ts`) merges them, so register new parts there.
 - **PrimeNG license** is read from Angular environments. Real keys go only in the
   git-ignored `src/environments/environment.local.ts` (copy from `.example`), never committed.
 - **Shared state lives in NgRx Signals stores** (signal store); plain signals are

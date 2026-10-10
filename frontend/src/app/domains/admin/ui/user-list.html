@@ -15,19 +15,19 @@
           icon="pi pi-cog"
           severity="secondary"
           [outlined]="true"
-          [label]="t('users.columns')"
+          [label]="t('common.columns')"
           (onClick)="columnsPopover.toggle($event)"
         />
         <p-popover #columnsPopover styleClass="w-72" [pt]="{ content: 'p-0!' }">
           <ng-template #content>
             <div class="flex items-center justify-between gap-2 border-b border-surface-200 px-4 py-3 dark:border-surface-700">
-              <span class="text-sm font-semibold">{{ t('users.columns') }}</span>
+              <span class="text-sm font-semibold">{{ t('common.columns') }}</span>
               <p-button
                 icon="pi pi-refresh"
                 variant="text"
                 size="small"
                 severity="secondary"
-                [label]="t('users.reset')"
+                [label]="t('common.reset')"
                 (onClick)="onResetColumns()"
               />
             </div>
@@ -53,16 +53,16 @@
             #globalSearchInput
             pInputText
             type="text"
-            [placeholder]="t('users.search')"
-            [attr.aria-label]="t('users.search')"
+            [placeholder]="t('common.search')"
+            [attr.aria-label]="t('common.search')"
             (input)="onGlobalSearch(globalSearchInput.value)"
             class="w-full"
           />
         </p-iconfield>
 
-        <p-button icon="pi pi-download" severity="secondary" [outlined]="true" [label]="t('users.export')" (onClick)="onExportCsv()" />
+        <p-button icon="pi pi-download" severity="secondary" [outlined]="true" [label]="t('common.export')" (onClick)="onExportCsv()" />
 
-        <p-button icon="pi pi-plus" [label]="t('users.add')" (onClick)="add.emit()" />
+        <p-button icon="pi pi-plus" [label]="t('common.add')" (onClick)="add.emit()" />
       </div>
     </ng-template>
     <ng-template #header let-columns>
@@ -123,7 +123,7 @@
                       <p-columnfilter type="date" display="menu" field="createdAt" [showOperator]="false" [showAddButton]="false" />
                     }
                     @default {
-                      <p-columnfilter type="text" display="menu" [field]="col.field" [placeholder]="t('users.filter')" />
+                      <p-columnfilter type="text" display="menu" [field]="col.field" [placeholder]="t('common.filter')" />
                     }
                   }
                 }
@@ -134,7 +134,7 @@
           }
         }
         <th scope="col" class="w-24">
-          <span class="sr-only">{{ t('users.actions') }}</span>
+          <span class="sr-only">{{ t('common.actions') }}</span>
         </th>
       </tr>
     </ng-template>
@@ -167,8 +167,8 @@
               icon="pi pi-pencil"
               variant="text"
               severity="secondary"
-              [ariaLabel]="t('users.edit')"
-              [pTooltip]="t('users.edit')"
+              [ariaLabel]="t('common.edit')"
+              [pTooltip]="t('common.edit')"
               tooltipPosition="left"
               (onClick)="edit.emit(row)"
             />
@@ -176,8 +176,8 @@
               [icon]="row.active ? 'pi pi-ban' : 'pi pi-check'"
               variant="text"
               severity="secondary"
-              [ariaLabel]="t(row.active ? 'users.deactivate' : 'users.activate')"
-              [pTooltip]="t(row.active ? 'users.deactivate' : 'users.activate')"
+              [ariaLabel]="t(row.active ? 'common.deactivate' : 'common.activate')"
+              [pTooltip]="t(row.active ? 'common.deactivate' : 'common.activate')"
               tooltipPosition="left"
               (onClick)="toggleActive.emit(row)"
             />

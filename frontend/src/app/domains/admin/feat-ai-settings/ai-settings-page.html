@@ -6,7 +6,7 @@
     @if (aiSettingsService.settings.error()) {
       <p-message severity="error">{{ t('aiSettings.loadError') }}</p-message>
     } @else if (aiSettingsService.settings.isLoading()) {
-      <div class="flex flex-auto items-center justify-center py-16" role="status" [attr.aria-label]="t('aiSettings.loading')">
+      <div class="flex flex-auto items-center justify-center py-16" role="status" [attr.aria-label]="t('common.loading')">
         <i class="pi pi-spinner pi-spin text-3xl text-surface-400 dark:text-surface-500" aria-hidden="true"></i>
       </div>
     } @else {
@@ -47,7 +47,7 @@
                   icon="pi pi-trash"
                   severity="danger"
                   [outlined]="true"
-                  [label]="t('aiSettings.remove')"
+                  [label]="t('common.remove')"
                   [loading]="isClearing()"
                   (onClick)="onClear()"
                 />
@@ -57,14 +57,14 @@
                 icon="pi pi-bolt"
                 severity="secondary"
                 [outlined]="true"
-                [label]="t('aiSettings.test')"
+                [label]="t('common.test')"
                 [loading]="isTesting()"
                 (onClick)="onTest()"
               />
               <p-button
                 type="submit"
                 icon="pi pi-check"
-                [label]="t('aiSettings.save')"
+                [label]="t('common.save')"
                 [loading]="isSaving()"
                 [disabled]="form().invalid() || !form().dirty()"
               />
